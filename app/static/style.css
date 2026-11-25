@@ -1,0 +1,72 @@
+:root {
+  --bg: #f4f6f8;
+  --card: #ffffff;
+  --text: #1f2933;
+  --muted: #5f6b7a;
+  --border: #d9dee4;
+  --primary: #1f5fa8;
+  --known: #1a7f37;
+  --unknown: #c2410c;
+  --error: #b42318;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 15px/1.5 -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+header { background: var(--primary); color: #fff; padding: 20px 24px; }
+header h1 { margin: 0; font-size: 22px; }
+header p { margin: 4px 0 0; opacity: 0.9; }
+
+main { max-width: 1100px; margin: 0 auto; padding: 20px 16px 40px; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+}
+.card h2 { margin: 0 0 8px; font-size: 18px; display: flex; align-items: center; gap: 10px; }
+
+.step {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--primary); color: #fff; font-size: 14px;
+}
+
+.hint { color: var(--muted); margin: 0 0 12px; }
+code { background: #eef1f4; padding: 1px 5px; border-radius: 4px; }
+
+.button {
+  display: inline-block;
+  background: var(--primary); color: #fff;
+  padding: 9px 18px; border-radius: 6px;
+  cursor: pointer; font-weight: 600;
+}
+.button:hover { filter: brightness(1.1); }
+.button[aria-disabled="true"] { background: #9aa5b1; cursor: not-allowed; filter: none; }
+
+.status { margin-top: 10px; min-height: 1.5em; }
+.status.error { color: var(--error); font-weight: 600; }
+.status.ok { color: var(--known); }
+
+.warnings { color: var(--unknown); margin: 6px 0 0; padding-left: 20px; font-size: 14px; }
+
+.summary { font-weight: 600; margin: 0 0 12px; }
+
+.results-layout { display: grid; grid-template-columns: minmax(0, 2fr) minmax(240px, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 760px) { .results-layout { grid-template-columns: 1fr; } }
+
+.canvas-wrap canvas { width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; }
+
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--border); }
+th { color: var(--muted); font-weight: 600; }
+td.known { color: var(--known); font-weight: 600; }
+td.unknown { color: var(--unknown); font-weight: 600; }

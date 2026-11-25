@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Who Is in the Photo?</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <h1>Who Is in the Photo?</h1>
+    <p>Identify people in a group photo using a folder of reference photos.</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2><span class="step">1</span> Load reference photos</h2>
+      <p class="hint">Choose a folder with one or more photos per person. The file name is used as the
+        person's name, e.g. <code>john_smith.jpg</code> or <code>john_smith_2.jpg</code>.</p>
+      <label class="button">
+        Choose folder…
+        <input id="folder-input" type="file" webkitdirectory multiple hidden>
+      </label>
+      <div id="gallery-status" class="status" role="status"></div>
+      <ul id="gallery-warnings" class="warnings"></ul>
+    </section>
+
+    <section class="card">
+      <h2><span class="step">2</span> Upload a group photo</h2>
+      <label class="button" id="photo-button" aria-disabled="true">
+        Choose photo…
+        <input id="photo-input" type="file" accept="image/*" hidden disabled>
+      </label>
+      <div id="photo-status" class="status" role="status"></div>
+    </section>
+
+    <section class="card" id="results" hidden>
+      <h2>Results</h2>
+      <p id="summary" class="summary"></p>
+      <div class="results-layout">
+        <div class="canvas-wrap"><canvas id="canvas"></canvas></div>
+        <table>
+          <thead><tr><th>#</th><th>Name</th><th>Similarity</th></tr></thead>
+          <tbody id="results-body"></tbody>
+        </table>
+      </div>
+      <p class="hint" id="threshold-note"></p>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
