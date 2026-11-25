@@ -4,9 +4,24 @@
 
 This document describes the implementation currently present in this repository. The application is a local web app for Task A: a user selects a folder of named reference photos, uploads one group photo, and sees detected faces labelled with a matching name or `Unknown`.
 
-**Important status:** the diagram below is a source-level architecture diagram in Mermaid. The assignment brief specifically asks for an Archify-generated diagram/export or screenshot. That Archify artifact has not yet been generated or checked into this repository; do not describe this Mermaid diagram as an Archify export.
+## Archify architecture diagram
 
-## System diagram
+![Architecture diagram generated with Archify](docs/architecture/face-id-architecture.svg)
+
+How it was made:
+- Generated with [Archify](https://github.com/tt-a1i/archify) v3.3.2, installed by following
+  its `llms.txt` instructions.
+- Source: [docs/architecture/candidate.json](docs/architecture/candidate.json).
+- Interactive version, with explanations and links to the cited source lines:
+  [docs/architecture/face-id-architecture.html](docs/architecture/face-id-architecture.html).
+  The image above is the static SVG export of that file.
+
+Checks:
+- Archify's `finalize` passed its automated validate, deliver, check and browser-check gates.
+- It confirmed 16 source-line references against commit `4d95f91`.
+- Archify's local receipt files are not committed, because they contain local machine paths.
+
+## Source-level diagram (Mermaid, hand-written; not an Archify export)
 
 ```mermaid
 flowchart TD
@@ -95,5 +110,5 @@ Face embeddings are sensitive biometric data. The current design keeps the galle
 - Real-model smoke test: InsightFace's bundled sample group image produced 6 detections; two cropped references matched at approximately 0.98 and 0.99, and four other faces were Unknown. These crops came from the same source image, so this is a pipeline smoke test, not an accuracy evaluation.
 - Browser end-to-end test: pending.
 - Wi-Fi-disabled offline test: pending.
-- Archify diagram export/screenshot: pending.
+- Archify diagram: generated and committed under `docs/architecture/` (see above).
 - Evaluation on held-out, labelled real group photos: pending.

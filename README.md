@@ -3,6 +3,17 @@
 A small local web app for BLP Industry.AI Task A. Choose a folder of reference photos, upload a
 group photo, and the app boxes each face and labels it with a name or **Unknown**.
 
+## Documentation
+
+- [ARCHITECTURE.md](ARCHITECTURE.md): components, data flow, trade-offs, and the Archify
+  architecture diagram ([SVG](docs/architecture/face-id-architecture.svg),
+  [interactive HTML](docs/architecture/face-id-architecture.html))
+- [RESEARCH.md](RESEARCH.md): technologies, papers, alternatives, licensing, development data
+- [AI_COLLAB.md](AI_COLLAB.md): AI collaboration record. Full chat exports are still pending.
+- [EVALUATION.md](EVALUATION.md): test results and evaluation status. Browser, Wi-Fi-off and
+  recognition-accuracy evaluation are still pending.
+- [docs/DEVELOPMENT_LOG.md](docs/DEVELOPMENT_LOG.md): decisions and test results in order
+
 ## How it works
 
 1. **Reference folder.** Each image's filename gives the person's name:
@@ -10,7 +21,7 @@ group photo, and the app boxes each face and labels it with a name or **Unknown*
    `john_smith_2.jpg`. Each photo becomes one 512-number face embedding. If a photo has several
    faces, the largest one is used. Photos with no face, or that can't be read, are skipped and
    listed as warnings.
-2. **Group photo.** InsightFace `buffalo_l` detects every face (RetinaFace detector) and
+2. **Group photo.** InsightFace `buffalo_l` detects every face (SCRFD detector) and
    computes an embedding for each one (ArcFace recogniser).
 3. **Matching.** Faces are compared to reference embeddings with cosine similarity. A person's
    score is their best-matching reference photo. A name is given only when the score is at least

@@ -155,7 +155,7 @@ class Gallery:
 
 
 class FaceEngine:
-    """Wraps InsightFace's buffalo_l model (RetinaFace detector + ArcFace recogniser)."""
+    """Wraps InsightFace's buffalo_l model (SCRFD detector + ArcFace recogniser)."""
 
     def __init__(self, model_root: str | Path, det_size: tuple[int, int] = (640, 640)):
         self.model_root = str(model_root)

@@ -1,0 +1,171 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Who Is in the Photo? — offline face identification",
+    "output": "docs/architecture/face-id-architecture.html",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/eekshith09/face-id-task-a.git",
+      "provider": "github",
+      "link_mode": "web",
+      "revision": "4d95f9140532ddd33b5f0a49a6145f936b95c59d"
+    }
+  },
+  "layout": { "mode": "auto" },
+  "components": [
+    {
+      "id": "staff",
+      "type": "external",
+      "label": "Office staff",
+      "sublabel": "uses a browser",
+      "sources": [{ "path": "app/static/index.html", "line": 18, "end_line": 35, "label": "two-step page" }]
+    },
+    {
+      "id": "page",
+      "type": "frontend",
+      "label": "Browser page",
+      "sublabel": "index.html + app.js",
+      "tag": "folder picker",
+      "explanation": "Step 1 uses <input webkitdirectory> to upload every file in the chosen folder (only the file name is sent, not the sub-folder path). Step 2 uploads one group photo. No external scripts, fonts or CDNs are loaded.",
+      "sources": [
+        { "path": "app/static/index.html", "line": 18, "end_line": 35, "label": "folder + photo inputs" },
+        { "path": "app/static/app.js", "line": 42, "end_line": 97, "label": "fetch /api/gallery, /api/identify" }
+      ]
+    },
+    {
+      "id": "results",
+      "type": "frontend",
+      "label": "Results view",
+      "sublabel": "canvas boxes + table",
+      "explanation": "Draws the group photo on a <canvas>, then a green box for identified faces or an orange box for Unknown, numbered left to right, plus a table of number, name and similarity score.",
+      "sources": [{ "path": "app/static/app.js", "line": 109, "end_line": 179, "label": "drawCanvas, fillTable" }]
+    },
+    {
+      "id": "api",
+      "type": "backend",
+      "label": "FastAPI server",
+      "sublabel": "uvicorn 127.0.0.1:8765",
+      "explanation": "POST /api/gallery builds and replaces the gallery (rejected if no usable faces; previous gallery kept). POST /api/identify decodes the photo and returns boxes, names and scores. GET /api/status reports the loaded people. Limits: 15 MB per image, 500 gallery images.",
+      "sources": [
+        { "path": "app/main.py", "line": 34, "end_line": 52, "label": "create_app, upload limit" },
+        { "path": "app/main.py", "line": 63, "end_line": 104, "label": "gallery + identify routes" }
+      ]
+    },
+    {
+      "id": "gallery",
+      "type": "database",
+      "label": "In-memory gallery",
+      "sublabel": "1 embedding per photo",
+      "tag": "lost on restart",
+      "explanation": "app.state.gallery holds a list of GalleryEntry(name, filename, 512-d embedding). Nothing is written to disk.",
+      "sources": [
+        { "path": "app/main.py", "line": 45, "end_line": 46, "label": "app.state.gallery" },
+        { "path": "app/face_engine.py", "line": 132, "end_line": 154, "label": "GalleryEntry, Gallery" }
+      ]
+    },
+    {
+      "id": "engine",
+      "type": "backend",
+      "label": "FaceEngine",
+      "sublabel": "decode, validate, embed",
+      "explanation": "build_gallery: name from file name (trailing numbers removed), decode, detect; 0 faces -> retry with 25% border, then skip with warning; several faces -> largest face used with a warning. identify: detect faces, call match_faces, number faces left to right.",
+      "sources": [
+        { "path": "app/face_engine.py", "line": 192, "end_line": 223, "label": "build_gallery" },
+        { "path": "app/face_engine.py", "line": 225, "end_line": 246, "label": "identify" },
+        { "path": "app/face_engine.py", "line": 37, "end_line": 48, "label": "name_from_filename" }
+      ]
+    },
+    {
+      "id": "insightface",
+      "type": "backend",
+      "label": "InsightFace FaceAnalysis",
+      "sublabel": "SCRFD detect + ArcFace embed",
+      "tag": "onnxruntime CPU",
+      "explanation": "Loaded once at startup with allowed_modules detection + recognition, CPUExecutionProvider, det_size 640x640. Returns boxes, detection scores and L2-normalised 512-d embeddings.",
+      "sources": [
+        { "path": "app/face_engine.py", "line": 165, "end_line": 190, "label": "load, detect" }
+      ]
+    },
+    {
+      "id": "matcher",
+      "type": "backend",
+      "label": "match_faces",
+      "sublabel": "cosine, best photo/person",
+      "tag": ">= 0.40 else Unknown",
+      "explanation": "Cosine similarity of every face against every reference photo; each person's score is the max over their photos; a name is given only at or above the threshold (default 0.40, not calibrated); greedy one-to-one assignment, strongest pairs first, so one name is never used for two faces.",
+      "sources": [
+        { "path": "app/face_engine.py", "line": 73, "end_line": 125, "label": "match_faces" }
+      ]
+    },
+    {
+      "id": "models",
+      "type": "database",
+      "label": "buffalo_l model files",
+      "sublabel": "./models (git-ignored)",
+      "tag": "det_10g + w600k_r50",
+      "explanation": "Local ONNX files: det_10g.onnx (SCRFD detector) and w600k_r50.onnx (ArcFace ResNet-50 recogniser), plus three unused modules. Not committed; licensed for non-commercial research use.",
+      "sources": [
+        { "path": "app/main.py", "line": 28, "end_line": 28, "label": "MODEL_ROOT" },
+        { "path": ".gitignore", "line": 7, "end_line": 9, "label": "models/ and *.onnx ignored" }
+      ]
+    },
+    {
+      "id": "release",
+      "type": "external",
+      "label": "InsightFace release",
+      "sublabel": "GitHub, one-time setup",
+      "explanation": "scripts/download_model.py calls FaceEngine.load(); InsightFace downloads buffalo_l.zip only if the files are missing. This is the only network access in the project and happens during setup, not at runtime.",
+      "sources": [{ "path": "scripts/download_model.py", "line": 1, "end_line": 16, "label": "download_model.py" }]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Your laptop (no internet needed after setup; not yet tested with Wi-Fi off)",
+      "wraps": ["page", "results", "api", "gallery", "engine", "insightface", "matcher", "models"]
+    }
+  ],
+  "connections": [
+    { "id": "staff-uses-page", "from": "staff", "to": "page", "label": "choose folder, photo" },
+    { "id": "page-posts", "from": "page", "to": "api", "label": "POST multipart", "variant": "emphasis" },
+    { "id": "api-stores", "from": "api", "to": "gallery", "label": "replace / read" },
+    { "id": "api-calls-engine", "from": "api", "to": "engine", "label": "build_gallery / identify", "variant": "emphasis" },
+    { "id": "engine-detects", "from": "engine", "to": "insightface", "label": "detect + embed" },
+    { "id": "engine-matches", "from": "engine", "to": "matcher", "label": "face + ref embeddings" },
+    { "id": "insightface-loads", "from": "insightface", "to": "models", "label": "load ONNX" },
+    { "id": "api-returns", "from": "api", "to": "results", "label": "JSON boxes, names" },
+    { "id": "setup-download", "from": "release", "to": "models", "label": "download once", "variant": "dashed" }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Recognition flow",
+      "items": [
+        "Folder upload -> one ArcFace embedding per reference photo, named from the file name",
+        "Group photo -> SCRFD finds every face -> embeddings",
+        "Cosine similarity, best photo per person, threshold 0.40 (not calibrated)",
+        "Greedy one-to-one assignment; everything else is Unknown"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Known limits",
+      "items": [
+        "Gallery lives in memory and is shared by all browser tabs",
+        "A multi-face reference photo uses its largest face (warning only)",
+        "HEIC/DNG not supported; CPU only"
+      ]
+    },
+    {
+      "dot": "slate",
+      "title": "Offline status",
+      "items": [
+        "No external URLs in the page; no cloud APIs in the code",
+        "Model download happens only in setup",
+        "Wi-Fi-off test still pending"
+      ]
+    }
+  ]
+}

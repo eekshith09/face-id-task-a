@@ -44,7 +44,7 @@ The following are relevant primary project/documentation sources for the technol
    Reference for the local model execution runtime used by the InsightFace installation.
 
 8. **Archify** — https://github.com/tt-a1i/archify  
-   Architecture diagram tool explicitly requested by the assignment. An Archify-generated export has not yet been added; see `ARCHITECTURE.md`.
+   Architecture diagram tool explicitly requested by the assignment. The Archify-generated diagram is in `docs/architecture/`; see `ARCHITECTURE.md`.
 
 ## Data used during development
 
