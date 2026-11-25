@@ -1,0 +1,27 @@
+# Python environment and caches
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+
+# Face-recognition model files (downloaded locally, ~600 MB, separately licensed)
+models/
+*.onnx
+
+# Secrets / local configuration (template allowed)
+.env
+.env.*
+!.env.example
+
+# Personal photos must never be committed. Patterns match any letter case
+# (e.g. .JPG from phones) regardless of the core.ignorecase setting.
+*.[jJ][pP][gG]
+*.[jJ][pP][eE][gG]
+*.[pP][nN][gG]
+*.[hH][eE][iI][cC]
+*.[wW][eE][bB][pP]
+*.[dD][nN][gG]
+sample_data/
+
+# OS files
+.DS_Store

@@ -1,0 +1,11 @@
+# Versions installed and tested in this project's .venv (Python 3.12.16, macOS arm64).
+fastapi==0.165.0
+uvicorn==0.54.0
+python-multipart==0.0.34
+insightface==0.7.3
+onnxruntime==1.32.0
+opencv-python-headless==5.1.0.95
+numpy==2.5.5
+# testing
+pytest==9.2.0
+httpx==0.28.1
